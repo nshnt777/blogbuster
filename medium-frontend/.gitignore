@@ -25,3 +25,4 @@ dist-ssr
 
 src/config.ts
 package-lock.json
+.env

@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { LoginInput, SignupInput } from "@nshnt777/medium-common-module";
 import { Button, Input, PasswordInput } from './Input'
 import axios from 'axios';
-import { BACKEND_URL } from "../config";
+import env from 'dotenv';
+env.config();
 
+const BACKEND_URL = process.env.BACKEND_URL;
 
 function AuthHeader({ type }: { type: "signup" | "login" }) {
 

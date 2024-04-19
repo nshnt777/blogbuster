@@ -1,6 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BACKEND_URL } from "../config";
+import env from 'dotenv';
+env.config();
+
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export interface Blog{
     id: string,
