@@ -1,0 +1,9 @@
+name = "medium-backend"
+compatibility_date = "2023-12-01"
+
+[vars]
+put database pool link here
+DATABASE_URL=""
+
+put jwt key here
+JWT_SECRET=""
