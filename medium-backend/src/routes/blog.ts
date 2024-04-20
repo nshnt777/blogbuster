@@ -20,11 +20,11 @@ blogRouter.use("/*", async (c, next) => {
 
     try {
         const verified = await verify(token, c.env.JWT_SECRET);
-    
+
         if (!verified.id) {
             throw new Error("Invalid authorization token");
         }
-    
+
         c.set('userId', verified.id);
 
         await next();
@@ -51,7 +51,7 @@ blogRouter.post('/publish', async (c) => {
 
         const { success } = createBlogSchema.safeParse(body);
 
-        if(!success){
+        if (!success) {
             console.error("Error: Invalid inputs sent")
             c.status(400);
             return c.json({
@@ -93,7 +93,7 @@ blogRouter.put('/', async (c) => {
 
         const { success } = updateBlogSchema.safeParse(body);
 
-        if(!success){
+        if (!success) {
             console.error("Error: Invalid inputs sent")
             c.status(400);
             return c.json({
@@ -130,7 +130,7 @@ blogRouter.get('/bulk', async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate());
-    
+
     try {
         // add pagination
         const allBlogs = await prisma.post.findMany({
@@ -146,7 +146,7 @@ blogRouter.get('/bulk', async (c) => {
                 }
             }
         })
-        
+
         return c.json({
             blogs: allBlogs
         })
@@ -159,12 +159,52 @@ blogRouter.get('/bulk', async (c) => {
     }
 })
 
-blogRouter.get('/:id', async (c) => {
-    
+blogRouter.get('/myblogs', async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate());
-    
+
+    try {
+        const userId = c.get('userId');
+
+        const myBlogs = await prisma.post.findMany({
+            where: {
+                author: {
+                    id: userId
+                }
+            },
+            select: {
+                title: true,
+                content: true,
+                id: true,
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        })
+
+        return c.json({
+            blogs: myBlogs
+        });
+    }
+    catch (error: any) {
+        console.error("Error encountered while getting your blogs: ", error.message);
+        c.status(411);
+        return c.json({
+            error: "Error occured while getting your blog"
+        })
+    }
+})
+
+
+blogRouter.get('/:id', async (c) => {
+
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
+
     try {
         const id = c.req.param('id');
 
@@ -198,6 +238,32 @@ blogRouter.get('/:id', async (c) => {
     }
 })
 
+blogRouter.delete('/:id', async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
 
+    try {
+        const postId = c.req.param('id');
+
+        const deletePost = await prisma.post.delete({
+            where: {
+                id: postId
+            }
+        })
+        
+        return c.json({
+            message: "Successfullly deleted your blog!",
+            success: true
+        })
+    }
+    catch (error: any) {
+        console.error("Error encountered while deleting blog: ", error.message);
+        c.status(411);
+        return c.json({
+            error: "Error encountered while deleting blog"
+        })
+    }
+})
 
 export { blogRouter };

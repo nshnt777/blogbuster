@@ -9,6 +9,8 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import { RecoilRoot, useSetRecoilState } from 'recoil'
 import userAtom from './store/userAtom'
+import Profile from './pages/Profile'
+import MyBlogs from './pages/MyBlogs'
 
 function App() {
 
@@ -22,6 +24,8 @@ function App() {
         <Route path='/blogs' element={<Blogs />}/>
         <Route path='/blog/:id' element={<Blog />}/>
         <Route path='/publish' element={<Publish />}/>
+        <Route path='/profile' element={<Profile />}/>
+        <Route path='/myblogs' element={<MyBlogs />}/>
       </Routes>
     </BrowserRouter>
     </RecoilRoot>
