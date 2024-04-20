@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import userAtom from "../store/userAtom";
 
 
 export function Appbar() {
@@ -17,14 +19,15 @@ export function Appbar() {
                     </button>
                 </Link>
 
-                <UserProfile name="Nishant" email="ns@gmail.com"/>
+                <UserProfile />
             </div>
         </div>
     )
 }
 
-function UserProfile({name, email} : {name: string, email: string}){
+function UserProfile(){
     const [dropdown, setDropdown] = useState(false);
+    const user = useRecoilValue(userAtom);
 
     function toggleDropdown(){
         setDropdown((prevVal)=>{
@@ -36,17 +39,17 @@ function UserProfile({name, email} : {name: string, email: string}){
         <div className="relative border-none">
 
             <div className="inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-white rounded-full text-center cursor-pointer" onClick={toggleDropdown}>
-                <span className="font-normal text-xl text-black">{name[0]}</span>
+                <span className="font-normal text-xl text-black">{user.name[0]}</span>
             </div>
 
-            {dropdown ? <DropDownMenu name={name} email={email} /> : null}
+            {dropdown ? <DropDownMenu /> : null}
             
         </div>
     )
 }
 
-function DropDownMenu({name, email} : {name: string, email: string}){
-
+function DropDownMenu(){
+    const user = useRecoilValue(userAtom);
     const navigate = useNavigate();
 
     function signOut(){
@@ -64,8 +67,8 @@ function DropDownMenu({name, email} : {name: string, email: string}){
     return(
         <div className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 absolute right-0">
                 <div className="px-4 py-3 text-sm text-gray-900">
-                    <div>{name}</div>
-                    <div className="font-medium truncate">{email}</div>
+                    <div>{user.name}</div>
+                    <div className="font-medium truncate">{user.email}</div>
                 </div>
 
                 <ul className="py-2 text-sm text-gray-700" aria-labelledby="avatarButton">

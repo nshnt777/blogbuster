@@ -6,11 +6,14 @@ import Blogs from './pages/Blogs'
 import { Blog } from './pages/Blog'
 import { Publish } from './pages/Publish'
 import { useEffect } from 'react'
+import axios from 'axios'
+import { RecoilRoot, useSetRecoilState } from 'recoil'
+import userAtom from './store/userAtom'
 
 function App() {
 
   return (
-    <>
+    <RecoilRoot>
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />}/>
@@ -21,12 +24,13 @@ function App() {
         <Route path='/publish' element={<Publish />}/>
       </Routes>
     </BrowserRouter>
-    </>
+    </RecoilRoot>
   )
 }
 
 function Home(){
   const navigate = useNavigate();
+  const setUser = useSetRecoilState(userAtom);
 
   useEffect(()=>{
     const authToken = localStorage.getItem("token");
@@ -35,7 +39,20 @@ function Home(){
       navigate('/login');
     }
     else{
-      navigate('/blogs')
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+      axios.get(`${BACKEND_URL}/api/v1/user/me`, {
+        headers: {
+          Authorization: localStorage.getItem('token')
+        }
+      })
+      .then((response)=>{
+        const userJson = response.data;
+        setUser(userJson)
+        navigate('/blogs')
+      })
+      .catch((error)=>{
+        console.log(error)
+      })
     }
   }, []);
 

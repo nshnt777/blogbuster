@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { sign } from "hono/jwt";
+import { sign, verify } from "hono/jwt";
 import {singupSchema, loginSchema} from '@nshnt777/medium-common-module'
 
 // any request coming to '/api/v1/user' gets routed to this file
@@ -90,6 +90,8 @@ userRouter.post("/login", async (c) => {
         const token = await sign({ id: existingUser.id }, c.env.JWT_SECRET);
 
         return c.json({
+            name: existingUser.name,
+            eamil: existingUser.email,
             JWT_token: token,
         });
     } catch (error: any) {
@@ -100,5 +102,50 @@ userRouter.post("/login", async (c) => {
         });
     }
 });
+
+//Get my details
+userRouter.get("/me", async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
+
+    const token = c.req.header("authorization") || "";
+
+    try {
+        const verified = await verify(token, c.env.JWT_SECRET);
+    
+        if (!verified.id) {
+            throw new Error("Invalid authorization token");
+        }
+        const userId = verified.id;
+
+        // console.log(userId);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+            }
+        })
+
+        console.log(user)
+        return c.json({
+            email: user?.email,
+            name: user?.name
+        })
+    }
+    catch (error: any) {
+        c.status(401);
+        console.error("Error in authorization: ", error.message);
+        return c.json({
+            error: "You are unauthorized"
+        })
+    }
+
+})
 
 export {userRouter};

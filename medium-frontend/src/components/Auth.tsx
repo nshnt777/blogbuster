@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { LoginInput, SignupInput } from "@nshnt777/medium-common-module";
 import { Button, Input, PasswordInput } from './Input'
 import axios from 'axios';
+import { useSetRecoilState } from "recoil";
+import userAtom from "../store/userAtom";
 // import { BACKEND_URL } from "../config";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -62,8 +64,8 @@ export function SignUpAuth() {
             const jwt = response.data.JWT_token;
 
             localStorage.setItem('token', jwt);
-
-            navigate('/blogs');
+            
+            navigate('/');
 
         }
         catch (error: any) {
@@ -133,6 +135,7 @@ export function LogInAuth() {
         email: "",
         password: ""
     });
+    const setUser = useSetRecoilState(userAtom);
 
     const navigate = useNavigate();
 
@@ -153,8 +156,14 @@ export function LogInAuth() {
             });
 
             const jwt = response.data.JWT_token;
-            console.log(jwt);
+            // console.log(jwt);
             localStorage.setItem('token', jwt);
+
+            const currentUser = response.data;
+            setUser({
+                email: currentUser.email,
+                name: currentUser.name
+            });
 
             navigate('/blogs');
 
