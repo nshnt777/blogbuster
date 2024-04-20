@@ -82,7 +82,7 @@ blogRouter.post('/publish', async (c) => {
 })
 
 // update the blog
-blogRouter.put('/', async (c) => {
+blogRouter.put('/update', async (c) => {
 
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,

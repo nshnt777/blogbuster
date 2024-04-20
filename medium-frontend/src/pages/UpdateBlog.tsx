@@ -1,21 +1,38 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Appbar } from "../components/Appbar";
 import axios from "axios";
-// import { BACKEND_URL } from "../config";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-export function Publish(){
-    // const [title, setTitle] = useState("");
-    // const [content, setContent] = useState("");
-
+export function UpdateBlog(){
     const [post, setPost] = useState({
         title: "",
         content: ""
     });
 
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+    
     const navigate = useNavigate();
+
+    const {id} = useParams();
+
+    useEffect(()=>{
+        axios.get(`${BACKEND_URL}/api/v1/blog/${id || ""}`, {
+            headers: {
+                Authorization: localStorage.getItem('token')
+            }
+        })
+        .then((response)=>{
+            const blog = response.data.blog;
+            setPost({
+                title: blog.title,
+                content: blog.content
+            });
+        })
+        .catch((error)=>{
+            console.log(error)
+        })
+    }, [])
 
     function handleChange(e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>, field: string){
         setPost((prevVal)=>{
@@ -26,9 +43,11 @@ export function Publish(){
         })
     }
 
-    async function publish(){
+    async function updateBlog(){
+        // console.log(post)
         try {
-            const resp = await axios.post(`${BACKEND_URL}/api/v1/blog/publish`, {
+            const resp = await axios.put(`${BACKEND_URL}/api/v1/blog/update`, {
+                id: id || "",
                 title: post.title,
                 content: post.content
             } , {
@@ -38,8 +57,7 @@ export function Publish(){
             });
 
             const json = resp.data;
-            console.log(json)
-            alert(json.message);
+            console.log(json);
             navigate(`/blog/${json.post}`)
         } catch (error: any) {
             if (error.response) {
@@ -62,21 +80,22 @@ export function Publish(){
 
             <div className="flex size-screen justify-center items-center ">
                 <div className="flex flex-col gap-2 mt-10 w-9/12">
-
-                    <input type="text" placeholder="Title" className="block border-l-2 focus:outline-none p-3 text-4xl font-bold w-full basis-9/12" 
+                    {/* title */}
+                    <input type="text" placeholder="Title" className="block border-l-2 focus:outline-none p-3 text-4xl font-bold w-full basis-9/12" value={post.title}
                         onChange={(e)=>{
                             handleChange(e, "title")
                         }}
                     />
 
-                    <textarea rows={10} className="block p-3 text-md w-full focus:outline-none basis-9/12" placeholder="Write your thoughts here..." 
+                    {/* content */}
+                    <textarea rows={10} className="block p-3 text-md w-full focus:outline-none basis-9/12" placeholder="Write your thoughts here..." value={post.content}
                         onChange={(e)=>{
                             handleChange(e, "content")
                         }}
                     />
 
-                    <button type="button" className="text-white bg-green-600 hover:bg-green-700 hover:text-slate-300 focus:outline-none focus:ring-1 focus:ring-green-600 font-medium rounded-full text-sm px-3 py-1.5 text-center mr-5 flex flex-col justify-center items-center w-1/4" onClick={publish}>
-                        Publish
+                    <button type="button" className="text-white bg-green-600 hover:bg-green-700 hover:text-slate-300 focus:outline-none focus:ring-1 focus:ring-green-600 font-medium rounded-full text-sm px-3 py-1.5 text-center mr-5 flex flex-col justify-center items-center w-1/4" onClick={updateBlog}>
+                        Update
                     </button>
                 </div>
 

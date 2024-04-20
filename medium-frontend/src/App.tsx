@@ -11,6 +11,7 @@ import { RecoilRoot, useSetRecoilState } from 'recoil'
 import userAtom from './store/userAtom'
 import Profile from './pages/Profile'
 import MyBlogs from './pages/MyBlogs'
+import { UpdateBlog } from './pages/UpdateBlog'
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
         <Route path='/publish' element={<Publish />}/>
         <Route path='/profile' element={<Profile />}/>
         <Route path='/myblogs' element={<MyBlogs />}/>
+        <Route path='/update/:id' element={<UpdateBlog />}/>
       </Routes>
     </BrowserRouter>
     </RecoilRoot>

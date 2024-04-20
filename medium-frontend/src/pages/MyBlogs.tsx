@@ -4,10 +4,13 @@ import axios from "axios";
 import BlogCard from "../components/BlogCard";
 import { Blog } from "../hooks";
 import { HomeSkeleton } from "../components/HomeSkeleton";
+import { useNavigate } from "react-router-dom";
 
 export default function MyBlogs(){
     const [myBlogs, setMyBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -96,7 +99,7 @@ export default function MyBlogs(){
                                 type="button" 
                                 className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-1 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                 onClick={()=>{
-                                    console.log("Updated")
+                                    navigate(`/update/${blog.id}`);
                                 }}>
                                     Update
                             </button>
