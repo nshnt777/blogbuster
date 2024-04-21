@@ -48,7 +48,7 @@ function Home(){
       const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
       axios.get(`${BACKEND_URL}/api/v1/user/me`, {
         headers: {
-          Authorization: localStorage.getItem('token')
+          Authorization: authToken
         }
       })
       .then((response)=>{
