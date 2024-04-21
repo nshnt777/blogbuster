@@ -1,10 +1,9 @@
 import axios from "axios";
-import { get } from "http";
 import { atom, selector } from "recoil";
 
 const userSelector = selector({
     key: 'userSelctor',
-    get: async ({get})=>{
+    get: async ()=>{
         const authToken = localStorage.getItem("token");
 
         if(authToken){
